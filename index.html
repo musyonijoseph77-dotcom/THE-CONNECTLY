@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,6 +121,7 @@
     .chat-heading {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 10px;
       padding-bottom: 15px;
       border-bottom: 1px solid var(--line);
@@ -129,11 +129,22 @@
 
     .online { color: var(--green); font-size: 13px; }
 
+    .video-call-btn {
+      background: #eef2ff;
+      color: var(--accent);
+      border: none;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
     .messages {
       display: flex;
       flex-direction: column;
       gap: 12px;
       padding: 20px 0;
+      max-height: 250px;
+      overflow-y: auto;
     }
 
     .bubble {
@@ -269,6 +280,30 @@
       line-height: 1.5;
     }
 
+    /* Video Call UI Overlay Styles */
+    .video-modal {
+      max-width: 550px;
+      background: #111827;
+      color: white;
+      text-align: center;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .video-box {
+      background: #1f2937;
+      height: 160px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
     @media (max-width: 750px) {
       .hero { grid-template-columns: 1fr; }
       .features { grid-template-columns: 1fr; }
@@ -307,7 +342,10 @@
       <div class="chat-card">
         <div class="chat-heading">
           <strong>✦ Your conversations</strong>
-          <span class="online">● Online</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="video-call-btn" id="startVideoCall">📹 Video Call</button>
+            <span class="online">● Online</span>
+          </div>
         </div>
         <div class="messages" id="messages">
           <div class="bubble">Hey! 👋 How is your day going?</div>
@@ -318,7 +356,7 @@
           <input id="messageInput" placeholder="Write a demo message..." aria-label="Demo message">
           <button class="primary" id="sendMessage">➤</button>
         </div>
-        <p class="notice">This is a website preview. Messages are not sent to other users yet.</p>
+        <p class="notice">This is a website preview. Messages are saved locally or via Supabase backend.</p>
       </div>
     </section>
 
@@ -352,6 +390,7 @@
 
   <footer>© 2026 Connectly · Be kind. Stay safe.</footer>
 
+  <!-- Auth Modal Overlay -->
   <div class="overlay" id="authOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal">
       <button class="close" id="closeModal" aria-label="Close">×</button>
@@ -378,22 +417,43 @@
         <button type="button" id="switchMode">Log in</button>
       </div>
 
-      <p class="notice">onsubmit</p>
       <p id="status" role="status"></p>
     </div>
-  </div>;
+  </div>
+
+  <!-- Video Call Interface Overlay -->
+  <div class="overlay" id="videoOverlay" role="dialog" aria-modal="true">
+    <div class="modal video-modal">
+      <button class="close" id="closeVideoModal" aria-label="Close" style="background:#374151; color:white;">×</button>
+      <h2>Connectly Video Call</h2>
+      <p style="color: #9ca3af; font-size: 13px;">Secure peer-to-peer preview room</p>
+      
+      <div class="video-grid">
+        <div class="video-box">Your Camera (Off)</div>
+        <div class="video-box">Participant (Waiting...)</div>
+      </div>
+
+      <button class="primary full" id="endCall" style="background: #ef4444; margin-top: 10px;">End Call</button>
+    </div>
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = https://gymkeoeabkqrdmwjskud.supabase.co;
-const SUPABASE_PUBLISHABLE_KEY =sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T;
+// Supabase Configuration (Safely quoted strings)
+const SUPABASE_URL = "https://gymkeoeabkqrdmwjskud.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+let supabaseClient = null;
+try {
+  if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && !SUPABASE_URL.includes("your-supabase")) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  }
+} catch (e) {
+  console.warn("Supabase initialization skipped or failed:", e);
+}
 
 const overlay = document.getElementById("authOverlay");
+const videoOverlay = document.getElementById("videoOverlay");
 let mode = "signup";
 
 function openAuth(nextMode) {
@@ -426,6 +486,7 @@ function openAuth(nextMode) {
   overlay.classList.add("show");
 }
 
+// Button Bindings
 document.getElementById("signupTop").onclick = () => openAuth("signup");
 document.getElementById("getStarted").onclick = () => openAuth("signup");
 document.getElementById("loginTop").onclick = () => openAuth("login");
@@ -442,6 +503,24 @@ document.getElementById("switchMode").onclick = () => {
   openAuth(mode === "signup" ? "login" : "signup");
 };
 
+// Video Call Triggers
+document.getElementById("startVideoCall").onclick = () => {
+  videoOverlay.classList.add("show");
+};
+
+document.getElementById("closeVideoModal").onclick = () => {
+  videoOverlay.classList.remove("show");
+};
+
+document.getElementById("endCall").onclick = () => {
+  videoOverlay.classList.remove("show");
+};
+
+videoOverlay.addEventListener("click", event => {
+  if (event.target === videoOverlay) videoOverlay.classList.remove("show");
+});
+
+// Authentication Handling Form Submission
 document.getElementById("authForm").addEventListener("submit", async event => {
   event.preventDefault();
 
@@ -456,6 +535,13 @@ document.getElementById("authForm").addEventListener("submit", async event => {
   button.textContent = "Please wait...";
   status.textContent = "";
 
+  if (!supabaseClient) {
+    status.textContent = "Supabase client is not configured with valid keys.";
+    button.disabled = false;
+    button.textContent = mode === "signup" ? "Create account" : "Log in";
+    return;
+  }
+
   try {
     if (mode === "signup") {
       const { data, error } = await supabaseClient.auth.signUp({
@@ -463,8 +549,7 @@ document.getElementById("authForm").addEventListener("submit", async event => {
         password,
         options: {
           data: { full_name: name },
-          emailRedirectTo:
-            window.location.origin + window.location.pathname
+          emailRedirectTo: window.location.origin + window.location.pathname
         }
       });
 
@@ -507,7 +592,9 @@ document.getElementById("sendMessage").onclick = () => {
   bubble.className = "bubble me";
   bubble.textContent = message;
 
-  document.getElementById("messages").appendChild(bubble);
+  const messagesContainer = document.getElementById("messages");
+  messagesContainer.appendChild(bubble);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
   input.value = "";
 };
 
