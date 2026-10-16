@@ -385,75 +385,79 @@
 const SUPABASE_URL = https://gymkeoeabkqrdmwjskud.supabase.co;
 const SUPABASE_PUBLISHABLE_KEY = sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T;
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'PASTE_YOUR_PROJECT_URL_HERE';
+const SUPABASE_PUBLISHABLE_KEY = 'PASTE_YOUR_PUBLISHABLE_KEY_HERE';
+
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
-  <script>
-    const overlay = document.getElementById("authOverlay");
-    let mode = "signup";
 
-    function openAuth(nextMode) {
-      mode = nextMode;
-      const signup = mode === "signup";
+const overlay = document.getElementById("authOverlay");
+let mode = "signup";
 
-      document.getElementById("modalTitle").textContent =
-        signup ? "Create your account" : "Welcome back";
+function openAuth(nextMode) {
+  mode = nextMode;
+  const signup = mode === "signup";
 
-      document.getElementById("modalDescription").textContent =
-        signup ? "Join Connectly and meet new people." : "Log in to your account.";
+  document.getElementById("modalTitle").textContent =
+    signup ? "Create your account" : "Welcome back";
 
-      document.getElementById("nameGroup").style.display =
-        signup ? "block" : "none";
+  document.getElementById("modalDescription").textContent =
+    signup ? "Join Connectly and meet new people." : "Log in to your account.";
 
-      document.getElementById("nameField").required = signup;
+  document.getElementById("nameGroup").style.display =
+    signup ? "block" : "none";
+  document.getElementById("nameField").required = signup;
 
-      document.getElementById("passwordField").autocomplete =
-        signup ? "new-password" : "current-password";
+  document.getElementById("passwordField").autocomplete =
+    signup ? "new-password" : "current-password";
 
-      document.getElementById("submitAuth").textContent =
-        signup ? "Create account" : "Log in";
+  document.getElementById("submitAuth").textContent =
+    signup ? "Create account" : "Log in";
 
-      document.getElementById("switchText").textContent =
-        signup ? "Already have an account?" : "New to Connectly?";
+  document.getElementById("switchText").textContent =
+    signup ? "Already have an account?" : "New to Connectly?";
 
-      document.getElementById("switchMode").textContent =
-        signup ? "Log in" : "Create account";
+  document.getElementById("switchMode").textContent =
+    signup ? "Log in" : "Create account";
 
-      document.getElementById("status").textContent = "";
-      overlay.classList.add("show");
-    }
+  document.getElementById("status").textContent = "";
+  overlay.classList.add("show");
+}
 
-    document.getElementById("signupTop").onclick = () => openAuth("signup");
-    document.getElementById("getStarted").onclick = () => openAuth("signup");
-    document.getElementById("loginTop").onclick = () => openAuth("login");
+document.getElementById("signupTop").onclick = () => openAuth("signup");
+document.getElementById("getStarted").onclick = () => openAuth("signup");
+document.getElementById("loginTop").onclick = () => openAuth("login");
 
-    document.getElementById("closeModal").onclick = () => {
-      overlay.classList.remove("show");
-    };
+document.getElementById("closeModal").onclick = () => {
+  overlay.classList.remove("show");
+};
 
-    overlay.addEventListener("click", event => {
-      if (event.target === overlay) overlay.classList.remove("show");
-    });
+overlay.addEventListener("click", event => {
+  if (event.target === overlay) overlay.classList.remove("show");
+});
 
-    document.getElementById("switchMode").onclick = () => {
-      openAuth(mode === "signup" ? "login" : "signup");
-    };
+document.getElementById("switchMode").onclick = () => {
+  openAuth(mode === "signup" ? "login" : "signup");
+};
 
-  
-document.getElementById('authForm').onsubmit=async e=>{.addEventListener("submit", async (event) => {
+document.getElementById("authForm").addEventListener("submit", async event => {
   event.preventDefault();
 
   const status = document.getElementById("status");
-  const submitButton = document.getElementById("submitAuth");
+  const button = document.getElementById("submitAuth");
 
   const name = document.getElementById("nameField").value.trim();
   const email = document.getElementById("emailField").value.trim();
   const password = document.getElementById("passwordField").value;
 
+  button.disabled = true;
+  button.textContent = "Please wait...";
   status.textContent = "";
-  submitButton.disabled = true;
-  submitButton.textContent = "Please wait...";
 
   try {
     if (mode === "signup") {
@@ -469,12 +473,9 @@ document.getElementById('authForm').onsubmit=async e=>{.addEventListener("submit
 
       if (error) throw error;
 
-      if (data.session) {
-        status.textContent = "Account created! You are now signed in.";
-      } else {
-        status.textContent =
-          "Account created. Please check your email for a confirmation link if required.";
-      }
+      status.textContent = data.session
+        ? "Account created! You are now signed in."
+        : "Account created. Check your email if confirmation is required.";
     } else {
       const { error } = await supabaseClient.auth.signInWithPassword({
         email,
@@ -483,47 +484,43 @@ document.getElementById('authForm').onsubmit=async e=>{.addEventListener("submit
 
       if (error) throw error;
 
-      status.textContent = "Login successful! Welcome to Connectly.";
       overlay.classList.remove("show");
+      status.textContent = "Login successful!";
     }
   } catch (error) {
-    status.textContent = error.message || "Something went wrong. Please try again.";
+    status.textContent = error.message || "Something went wrong.";
   } finally {
-    submitButton.disabled = false;
-    submitButton.textContent =
-      mode === "signup" ? "Create account" : "Log in";
+    button.disabled = false;
+    button.textContent = mode === "signup" ? "Create account" : "Log in";
   }
 });
 
-    document.getElementById("explore").onclick = () => {
-      document.getElementById("features").scrollIntoView({ behavior: "smooth" });
-    };
+document.getElementById("explore").onclick = () => {
+  document.getElementById("features").scrollIntoView({
+    behavior: "smooth"
+  });
+};
 
-    document.getElementById("sendMessage").onclick = () => {
-      const input = document.getElementById("messageInput");
-      const message = input.value.trim();
+document.getElementById("sendMessage").onclick = () => {
+  const input = document.getElementById("messageInput");
+  const message = input.value.trim();
+  if (!message) return;
 
-      if (!message) return;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble me";
+  bubble.textContent = message;
 
-      const bubble = document.createElement("div");
-      bubble.className = "bubble me";
-      bubble.textContent = message;
+  document.getElementById("messages").appendChild(bubble);
+  input.value = "";
+};
 
-      document.getElementById("messages").appendChild(bubble);
-      input.value = "";
-    };
-
-    document.getElementById("messageInput").addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        document.getElementById("sendMessage").click();
-      }
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    }); 
-      document.getElementById("messageInput").addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        document.getElementById("sendMessage").click();
-      }
-    });
-  </script>
+document.getElementById("messageInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    document.getElementById("sendMessage").click();
+  }
+});
+</script>
 </body>
 </html>
+
+
