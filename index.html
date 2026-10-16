@@ -382,7 +382,13 @@
       <p id="status" role="status"></p>
     </div>
   </div>
+const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
+const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
   <script>
     const overlay = document.getElementById("authOverlay");
     let mode = "signup";
@@ -434,12 +440,60 @@
       openAuth(mode === "signup" ? "login" : "signup");
     };
 
-    document.getElementById("authForm").addEventListener("submit", event => {
-      event.preventDefault();
+  
+document.getElementById("authForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-      document.getElementById("status").textContent =
-        "Demo only: accounts are not being created yet. Supabase authentication must be connected first.";
-    });
+  const status = document.getElementById("status");
+  const submitButton = document.getElementById("submitAuth");
+
+  const name = document.getElementById("nameField").value.trim();
+  const email = document.getElementById("emailField").value.trim();
+  const password = document.getElementById("passwordField").value;
+
+  status.textContent = "";
+  submitButton.disabled = true;
+  submitButton.textContent = "Please wait...";
+
+  try {
+    if (mode === "signup") {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name },
+          emailRedirectTo:
+            window.location.origin + window.location.pathname
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        status.textContent = "Account created! You are now signed in.";
+      } else {
+        status.textContent =
+          "Account created. Please check your email for a confirmation link if required.";
+      }
+    } else {
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      status.textContent = "Login successful! Welcome to Connectly.";
+      overlay.classList.remove("show");
+    }
+  } catch (error) {
+    status.textContent = error.message || "Something went wrong. Please try again.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent =
+      mode === "signup" ? "Create account" : "Log in";
+  }
+});
 
     document.getElementById("explore").onclick = () => {
       document.getElementById("features").scrollIntoView({ behavior: "smooth" });
@@ -463,7 +517,7 @@
       if (event.key === "Enter") {
         document.getElementById("sendMessage").click();
       }
-    });
+    });<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </script>
 </body>
 </html>
