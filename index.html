@@ -441,7 +441,7 @@ const supabaseClient = window.supabase.createClient(
     };
 
   
-document.getElementById("authForm").addEventListener("submit", async (event) => {
+document.getElementById('authForm').onsubmit=async e=>{.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const status = document.getElementById("status");
