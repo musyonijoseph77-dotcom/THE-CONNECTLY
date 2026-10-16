@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connectly — Chat & Video</title>
+  <meta name="description" content="Connect with people, chat online, and enjoy meaningful conversations with Connectly.">
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --text: #171c2c;
+      --muted: #727b91;
+      --line: #e5e9f2;
+      --accent: #6858e8;
+      --green: #22b878;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 6%;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border-radius: 10px;
+      padding: 12px 17px;
+      font-weight: bold;
+    }
+
+    .primary {
+      border: none;
+      color: white;
+      background: var(--accent);
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 65px 24px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 45px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(40px, 5vw, 62px);
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin: 18px 0;
+    }
+
+    .highlight { color: var(--accent); }
+
+    .lead {
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 17px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    .chat-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 20px 55px #252b4814;
+    }
+
+    .chat-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .online { color: var(--green); font-size: 13px; }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 20px 0;
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 12px;
+      background: #f0efff;
+      border-radius: 14px;
+      line-height: 1.5;
+    }
+
+    .bubble.me {
+      align-self: flex-end;
+      background: var(--accent);
+      color: white;
+    }
+
+    .composer {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--line);
+      padding-top: 15px;
+    }
+
+    .composer input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin: 75px 0 25px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 25px;
+    }
+
+    .feature-icon { font-size: 30px; }
+    .feature p { color: var(--muted); line-height: 1.7; }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      background: #101323bb;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .overlay.show { display: flex; }
+
+    .modal {
+      position: relative;
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .modal h2 { margin-top: 0; }
+
+    .modal label {
+      display: block;
+      font-weight: bold;
+      margin: 15px 0 7px;
+      font-size: 14px;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+
+    .full { width: 100%; margin-top: 20px; }
+
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 12px;
+      border: none;
+      background: #f0f1f7;
+      font-size: 20px;
+    }
+
+    .switch {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .switch button {
+      border: none;
+      background: none;
+      color: var(--accent);
+      padding: 5px;
+    }
+
+    .notice {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 15px;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 750px) {
+      .hero { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+      main { padding: 40px 18px; }
+      header { padding: 16px; }
+      .brand { font-size: 20px; }
+      h1 { letter-spacing: -1px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">✦ Connectly</div>
+    <div class="actions">
+      <button class="secondary" id="loginTop">Log in</button>
+      <button class="primary" id="signupTop">Create account</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">MEET. MESSAGE. CONNECT.</div>
+        <h1>Your people are just a <span class="highlight">hello</span> away.</h1>
+        <p class="lead">
+          Meet new people, have real conversations, and stay close.
+          Connect through messages and face-to-face video calls.
+        </p>
+        <div class="hero-buttons">
+          <button class="primary" id="getStarted">Get started — it's free</button>
+          <button class="secondary" id="explore">Explore Connectly</button>
+        </div>
+      </div>
+
+      <div class="chat-card">
+        <div class="chat-heading">
+          <strong>✦ Your conversations</strong>
+          <span class="online">● Online</span>
+        </div>
+        <div class="messages" id="messages">
+          <div class="bubble">Hey! 👋 How is your day going?</div>
+          <div class="bubble me">Pretty good! Nice to meet you.</div>
+          <div class="bubble">Welcome to Connectly 😊</div>
+        </div>
+        <div class="composer">
+          <input id="messageInput" placeholder="Write a demo message..." aria-label="Demo message">
+          <button class="primary" id="sendMessage">➤</button>
+        </div>
+        <p class="notice">This is a website preview. Messages are not sent to other users yet.</p>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="section-heading">
+        <h2>Connect your way</h2>
+        <p>Simple tools for meaningful conversations.</p>
+      </div>
+
+      <div class="features">
+        <article class="feature">
+          <div class="feature-icon">💬</div>
+          <h3>Instant messaging</h3>
+          <p>Send messages and keep conversations going with people you meet.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">📹</div>
+          <h3>Video calls</h3>
+          <p>Talk face to face when you're ready to connect more personally.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">🛡️</div>
+          <h3>Safer connections</h3>
+          <p>Build a welcoming community with privacy and respect at its heart.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 Connectly · Be kind. Stay safe.</footer>
+
+  <div class="overlay" id="authOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <button class="close" id="closeModal" aria-label="Close">×</button>
+      <h2 id="modalTitle">Create your account</h2>
+      <p id="modalDescription">Join the conversation.</p>
+
+      <form id="authForm">
+        <div id="nameGroup">
+          <label for="nameField">Your name</label>
+          <input id="nameField" name="name" autocomplete="name" placeholder="Your name" required>
+        </div>
+
+        <label for="emailField">Email address</label>
+        <input id="emailField" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+
+        <label for="passwordField">Password</label>
+        <input id="passwordField" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
+
+        <button class="primary full" id="submitAuth" type="submit">Create account</button>
+      </form>
+
+      <div class="switch">
+        <span id="switchText">Already have an account?</span>
+        <button type="button" id="switchMode">Log in</button>
+      </div>
+
+      <p class="notice">Registration and login are demo-only until authentication is connected.</p>
+      <p id="status" role="status"></p>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById("authOverlay");
+    let mode = "signup";
+
+    function openAuth(nextMode) {
+      mode = nextMode;
+      const signup = mode === "signup";
+
+      document.getElementById("modalTitle").textContent =
+        signup ? "Create your account" : "Welcome back";
+
+      document.getElementById("modalDescription").textContent =
+        signup ? "Join Connectly and meet new people." : "Log in to your account.";
+
+      document.getElementById("nameGroup").style.display =
+        signup ? "block" : "none";
+
+      document.getElementById("nameField").required = signup;
+
+      document.getElementById("passwordField").autocomplete =
+        signup ? "new-password" : "current-password";
+
+      document.getElementById("submitAuth").textContent =
+        signup ? "Create account" : "Log in";
+
+      document.getElementById("switchText").textContent =
+        signup ? "Already have an account?" : "New to Connectly?";
+
+      document.getElementById("switchMode").textContent =
+        signup ? "Log in" : "Create account";
+
+      document.getElementById("status").textContent = "";
+      overlay.classList.add("show");
+    }
+
+    document.getElementById("signupTop").onclick = () => openAuth("signup");
+    document.getElementById("getStarted").onclick = () => openAuth("signup");
+    document.getElementById("loginTop").onclick = () => openAuth("login");
+
+    document.getElementById("closeModal").onclick = () => {
+      overlay.classList.remove("show");
+    };
+
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) overlay.classList.remove("show");
+    });
+
+    document.getElementById("switchMode").onclick = () => {
+      openAuth(mode === "signup" ? "login" : "signup");
+    };
+
+    document.getElementById("authForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      document.getElementById("status").textContent =
+        "Demo only: accounts are not being created yet. Supabase authentication must be connected first.";
+    });
+
+    document.getElementById("explore").onclick = () => {
+      document.getElementById("features").scrollIntoView({ behavior: "smooth" });
+    };
+
+    document.getElementById("sendMessage").onclick = () => {
+      const input = document.getElementById("messageInput");
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble me";
+      bubble.textContent = message;
+
+      document.getElementById("messages").appendChild(bubble);
+      input.value = "";
+    };
+
+    document.getElementById("messageInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        document.getElementById("sendMessage").click();
+      }
+    });
+  </script>
+</body>
+</html>
