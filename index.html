@@ -519,6 +519,11 @@ document.getElementById('authForm').onsubmit=async e=>{.addEventListener("submit
       }
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     }); 
+      document.getElementById("messageInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        document.getElementById("sendMessage").click();
+      }
+    });
   </script>
 </body>
 </html>
