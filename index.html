@@ -444,24 +444,28 @@
 const SUPABASE_URL = "https://gymkeoeabkqrdmwjskud.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T";
 
+
 let supabaseClient = null;
 
 try {
   if (
     window.supabase &&
     /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
-    SUPABASE_PUBLISHABLE_KEY !== "sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T"
+    SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
   ) {
     supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY
     );
   } else {
-    console.error("Supabase URL or publishable key is missing or invalid.");
+    console.error(
+      "Supabase URL, library, or publishable key is invalid."
+    );
   }
 } catch (error) {
   console.error("Supabase initialization failed:", error);
 }
+
 
 const overlay = document.getElementById("authOverlay");
 const videoOverlay = document.getElementById("videoOverlay");
