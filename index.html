@@ -440,16 +440,27 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // Supabase Configuration (Safely quoted strings)
+
 const SUPABASE_URL = "https://gymkeoeabkqrdmwjskud.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T";
 
 let supabaseClient = null;
+
 try {
-  if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && !SUPABASE_URL.includes(https://gymkeoeabkqrdmwjskud.supabase.co)) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T);
+  if (
+    window.supabase &&
+    /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
+    SUPABASE_PUBLISHABLE_KEY !== "sb_publishable_mC3frYYTdLLE3rKcOWtjug_O-4taE4T"
+  ) {
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+  } else {
+    console.error("Supabase URL or publishable key is missing or invalid.");
   }
-} catch (e) {
-  console.warn("Supabase initialization skipped or failed:", e);
+} catch (error) {
+  console.error("Supabase initialization failed:", error);
 }
 
 const overlay = document.getElementById("authOverlay");
